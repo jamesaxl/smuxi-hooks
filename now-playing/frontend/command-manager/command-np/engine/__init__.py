@@ -15,13 +15,5 @@
 # 0. You just DO WHAT THE FUCK YOU WANT TO.
 
 from mprisplayer import MprisPlayer
-
-#BEFORE ADD ANY PLAYER TO 'MPLAS' TUPLE BE SURE PLEASE THAT IT SUPPORTS MPRIS2
-MPLAS = ('vlc', 
-        'rhythmbox', 
-        'clementine', 
-        'spotify', 
-        'tomahawk', 
-        'amarok', 
-        'banshee')
+from midori import Midori
 

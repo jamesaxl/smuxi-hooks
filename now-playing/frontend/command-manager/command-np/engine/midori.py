@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 #-*- coding: utf-8 -*-
 #
 # DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
@@ -15,8 +14,16 @@
 #
 # 0. You just DO WHAT THE FUCK YOU WANT TO.
 
-import engine
+import bernami
+import sys
 
-DEAMONS = [engine.MprisPlayer.MprisTrackInfos(), engine.Midori.MidoriTrackInfos()]
+class Midori(bernami.Bernami):
 
-
+    @classmethod
+    def MidoriTrackInfos(cls):
+        super(Midori, cls).MidoriTrackInfos()
+        if cls._iface:
+            properties = cls._iface.GetAll('org.midori.mediaHerald')
+            output = properties.get("VideoTitle")[1:] + ' - '+ properties.get("VideoUri")[0:]
+            print(u"ProtocolManager.Command /me is playing: {}".format(output).encode("utf-8"))
+            sys.exit()

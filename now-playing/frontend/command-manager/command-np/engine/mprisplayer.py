@@ -15,40 +15,34 @@
 # 0. You just DO WHAT THE FUCK YOU WANT TO.
 
 import sys
+import bernami
+#BEFORE ADD ANY PLAYER TO 'MPLAS' TUPLE BE SURE PLEASE THAT IT SUPPORTS MPRIS2
+MPLAS = ('vlc', 'rhythmbox', 'clementine', 
+        'spotify', 'tomahawk', 'amarok', 
+        'banshee')
 
-try:
-    import dbus
-except ImportError:
-    print (u"ProtocolManager.Command /echo you need to install python-dbus :)")
-    sys.exit()
+class MprisPlayer(bernami.Bernami):
 
-class MprisPlayer(object):
+    @classmethod
+    def MprisTrackInfos(cls):
 
-    def __init__(self, mplayer):
-        session_bus = dbus.SessionBus()
-        player = session_bus.get_object('org.mpris.MediaPlayer2.%s' %mplayer, '/org/mpris/MediaPlayer2')
-        self.__iface = dbus.Interface(player, dbus_interface='org.freedesktop.DBus.Properties')
+        for mpla in MPLAS :
+            super(MprisPlayer, cls).MprisTrackInfos(mpla)
+            if cls._iface:
+                player_stat = cls._iface.Get('org.mpris.MediaPlayer2.Player', 'PlaybackStatus')
+                if player_stat == 'Playing':
+                    try:
+                        artist = cls._iface.Get('org.mpris.MediaPlayer2.Player','Metadata').get(cls._string(u'xesam:artist'))[0]
+                        if artist == None: artist = 'Unknown'
+                    except TypeError:
+                        artist = 'Unknown'
 
-    def GetTrackInfos(self):
-        try:
-            artist = self.__iface.Get('org.mpris.MediaPlayer2.Player','Metadata').get(dbus.String(u'xesam:artist'))[0]
-            if artist == None: artist = 'Unknown'
-        except TypeError:
-            artist = 'Unknown'
+                    try:
+                        title = cls._iface.Get('org.mpris.MediaPlayer2.Player','Metadata').get(cls._string(u'xesam:title'))
+                        if title == None: title = 'Unknown'
+                    except TypeError:
+                        title = 'Unknown'
 
-        try:
-            title = self.__iface.Get('org.mpris.MediaPlayer2.Player','Metadata').get(dbus.String(u'xesam:title'))
-            if title == None: title = 'Unknown'
-        except TypeError:
-            title = 'Unknown'
-
-        output = artist + ' - '+ title
-        print(u"ProtocolManager.Command /me is playing: {}".format(output).encode("utf-8"))
-
-    def GetStatus(self):
-        player_stat = self.__iface.Get('org.mpris.MediaPlayer2.Player', 'PlaybackStatus')
-        if player_stat == 'Playing':
-            return True
-        return False
-
-       
+                    output = artist + ' - '+ title
+                    print(u"ProtocolManager.Command /me is playing: {}".format(output).encode("utf-8"))
+                    sys.exit()
