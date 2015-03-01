@@ -34,4 +34,6 @@ try:
     player_pid = subprocess.check_output(['pgrep', 'midori', '-u', USER])
     engine.Midori.GetTrackInfos()
 except subprocess.CalledProcessError:
-    player_pid = False
+    pass
+
+engine.Mpd.GetTrackInfos()

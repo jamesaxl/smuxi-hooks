@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 #-*- coding: utf-8 -*-
 #
 # DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
@@ -15,31 +14,27 @@
 #
 # 0. You just DO WHAT THE FUCK YOU WANT TO.
 
-import sys
-
 try:
-    import dbus
+    import mpd
 except ImportError:
-    print (u"ProtocolManager.Command /echo you need to install python-dbus :)")
+    print (u"ProtocolManager.Command /echo you need to install python-mpd :)")
     sys.exit()
 
-class Midori(object):
+class Mpd(object):
 
     def __init__(self):
-
-        session_bus = dbus.SessionBus()
+        self.__client = mpd.MPDClient()
         try:
-            player = session_bus.get_object('org.midori.mediaHerald','/org/midori/mediaHerald')
-            self.__iface = dbus.Interface(player, dbus_interface='org.freedesktop.DBus.Properties')
-        except:
-            print (u"ProtocolManager.Command /echo you need to run midori extension 'Webmedia now-playing' :)")
+            self.__client.connect('localhost', '6600')
+        except socket.error:
+            print (u"ProtocolManager.Command /echo check you MPD connection :)")
             sys.exit()
 
     @classmethod
     def GetTrackInfos(cls):
-        midori = Midori()
-        properties = midori.__iface.GetAll('org.midori.mediaHerald')
-        output =  properties.get("VideoTitle")[1:] + ' - '+ properties.get("VideoUri")[0:]
+        smpd = Mpd()
+        output = smpd.__client.currentsong()['artist'] + ' - '+ smpd.__client.currentsong()['title']
         print(u"ProtocolManager.Command /me is playing: {}".format(output).encode("utf-8"))
+        smpd.__client.close()
+        smpd.__client.disconnect()
         sys.exit()
-
